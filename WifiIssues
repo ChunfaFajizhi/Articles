@@ -1,0 +1,108 @@
+https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=931561
+
+After follow the following, the adapter can detect the wifi, but could not jion the wifi
+git clone 
+https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git
+
+cd linux-firmware
+
+mkdir /lib/firmware/mediatek/
+
+cp mediatek/mt7610u.bin /lib/firmware/mediatek/
+
+rmmod mt76x0
+
+modprobe mt76x0
+
+Adapter is working.
+
+
+
+#https://lists.debian.org/debian-user/2017/06/msg01045.html
+# The following instruction solved the problem.
+
+On Sun, Jun 25, 2017 at 7:23 AM, Mauricio <tauro.kpo@gmail.com> wrote:
+
+    Hello Yann,
+
+    I found your mail on the web and I think I have a solution (it has worked for me!).
+
+    As root, run:
+
+    ln -s /dev/null /etc/systemd/network/99-default.link
+
+    This will prevent systemd to create the long network interfaces names. It seems some firmwares don't play well with them. You must unplug-plug the USB dongle (or restart of it is internal).
+
+    This has worked for me. I'm using a TL-WN821N (atheros firmware) Wifi USB dongle.
+
+    My source:
+    https://www.reddit.com/r/debian/comments/5leii8/unable_to_connect_to_wifi_with_usb_adapter_via/
+
+    I hope this helps you. Happy hacking!
+
+
+
+--- End Message --
+
+
+
+#Pick an LAN address in the subnet your router supports that is not in use. Let's say you choose 192.168.1.97. Now open a terminal and enter:
+Code:
+
+sudo /sbin/ifconfig eth0 192.168.1.97 netmask 255.255.255.0 broadcast 192.168.1.255
+
+chunfa@Fajizhi:~$ sudo ifconfig -a
+docker0: flags=4099<UP,BROADCAST,MULTICAST>  mtu 1500
+        inet 172.17.0.1  netmask 255.255.0.0  broadcast 172.17.255.255
+        ether 02:42:27:4b:5b:f1  txqueuelen 0  (Ethernet)
+        RX packets 0  bytes 0 (0.0 B)
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 0  bytes 0 (0.0 B)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+
+enp7s0: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
+        inet 192.168.0.16  netmask 255.255.255.0  broadcast 192.168.0.255
+        inet6 2607:fea8:4ee0:15e6:692:26ff:fed8:6ee9  prefixlen 64  scopeid 0x0<global>
+        inet6 fd00:a84e:3fed:fa62:692:26ff:fed8:6ee9  prefixlen 64  scopeid 0x0<global>
+        inet6 fe80::692:26ff:fed8:6ee9  prefixlen 64  scopeid 0x20<link>
+        inet6 fd00:a84e:3fed:fa62:f9dd:f22d:20f0:be17  prefixlen 64  scopeid 0x0<global>
+        inet6 2607:fea8:4ee0:15e6:f9dd:f22d:20f0:be17  prefixlen 64  scopeid 0x0<global>
+        ether 04:92:26:d8:6e:e9  txqueuelen 1000  (Ethernet)
+        RX packets 13970  bytes 8520872 (8.1 MiB)
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 15052  bytes 2061160 (1.9 MiB)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+        device memory 0xf6500000-f651ffff  
+
+lo: flags=73<UP,LOOPBACK,RUNNING>  mtu 65536
+        inet 127.0.0.1  netmask 255.0.0.0
+        inet6 ::1  prefixlen 128  scopeid 0x10<host>
+        loop  txqueuelen 1000  (Local Loopback)
+        RX packets 3011  bytes 356014 (347.6 KiB)
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 3011  bytes 356014 (347.6 KiB)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+
+wlan0: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
+        inet 10.42.0.1  netmask 255.255.255.0  broadcast 10.42.0.255
+        inet6 fe80::6d9d:d06c:cca8:68fe  prefixlen 64  scopeid 0x20<link>
+        ether 50:3e:aa:96:9c:6b  txqueuelen 1000  (Ethernet)
+        RX packets 4392  bytes 704555 (688.0 KiB)
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 172  bytes 27948 (27.2 KiB)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+
+
+#https://wiki.debian.org/WiFi/HowToUse
+
+#finally problem solved
+$ sudo nano resolv.conf
+#add two namesever as following:
+nameserver 8.8.8.8
+nameserver 8.8.4.4
+
+disable the previous one, mine is 2
+then 
+$ sudo service network-manager restart
+OK!
+2020/01/17
