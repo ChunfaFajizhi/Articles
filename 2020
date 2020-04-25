@@ -6,3 +6,7 @@ https://doi.org/10.1073/pnas.1517719113
 
 For sensors
 https://www.kubuntuforums.net/showthread.php/74401-Driver-for-Asus-B450-motherboard-to-enable-LM-Sensors-other-boards
+
+##Changing webbrowser priority
+https://askubuntu.com/questions/620955/how-to-change-priorities-of-x-www-browser
+sudo gedit /var/lib/dpkg/alternatives/x-www-browser
